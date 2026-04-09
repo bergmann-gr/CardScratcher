@@ -19,16 +19,17 @@ class ScratchCardCoordinator(
   }
 
   suspend fun activateCard(): ActivationResult {
-    if (cardRepository.cardState.value == CardState.ACTIVATED) {
+    if (cardRepository.cardState.value is CardState.Activated) {
       return ActivationResult.Activated(androidVersion = 0)
     }
 
-    val code = cardRepository.scratchCode.value ?: return ActivationResult.MissingCode
+    val cardState = cardRepository.cardState.value as? CardState.Scratched
+    val code = cardState?.code ?: return ActivationResult.MissingCode
 
     return withContext(NonCancellable) {
       when (val result = cardActivator.activate(code)) {
         is ActivationResult.Activated -> {
-          cardRepository.markActivated()
+          cardRepository.markActivated(code)
           result
         }
         else -> result

@@ -7,7 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ActivationRepositoryImplTest {
+class CardActivatorImplTest {
 
   @Test
   fun `activate returns Activated when android version is high enough`() = runTest {

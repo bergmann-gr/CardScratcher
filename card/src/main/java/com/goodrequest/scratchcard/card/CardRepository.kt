@@ -5,10 +5,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface CardRepository {
   val cardState: StateFlow<CardState>
-  val scratchCode: StateFlow<String?>
 
   fun markScratched(code: String)
-  fun markActivated()
+  fun markActivated(code: String)
   fun reset()
 }
 

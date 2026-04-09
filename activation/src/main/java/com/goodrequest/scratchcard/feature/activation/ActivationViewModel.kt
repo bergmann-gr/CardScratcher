@@ -42,4 +42,10 @@ class ActivationViewModel @Inject constructor(
       }
     }
   }
+
+  fun dismissError() {
+    if (_uiState.value is ActivationUiState.Error) {
+      _uiState.value = ActivationUiState.Idle
+    }
+  }
 }

@@ -30,13 +30,12 @@ class ScratchViewModel @Inject constructor(
   private var scratchJob: Job? = null
 
   val cardState: StateFlow<CardState> = cardRepository.cardState
-  val scratchCode: StateFlow<String?> = cardRepository.scratchCode
 
   private val _scratchState = MutableStateFlow<ScratchUiState>(ScratchUiState.Idle)
   val scratchState: StateFlow<ScratchUiState> = _scratchState.asStateFlow()
 
   fun scratchCard() {
-    if (scratchState.value !is ScratchUiState.Loading && cardState.value == CardState.UNSCRATCHED) {
+    if (scratchState.value !is ScratchUiState.Loading && cardState.value is CardState.Unscratched) {
       _scratchState.value = ScratchUiState.Loading
       scratchJob?.cancel()
       scratchJob = viewModelScope.launch {

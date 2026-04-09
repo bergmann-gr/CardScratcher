@@ -25,20 +25,14 @@ class ScratchCardCoordinatorTest {
   @Test
   fun `scratchCard marks card scratched and stores code`() = testScope.runTest {
     val cardRepository = CardRepositoryImpl()
-    val scratchCodeGenerator = object : ScratchCodeGenerator {
-      override suspend fun generate(): String = "code-123"
-    }
-    val cardActivator = object : CardActivator {
-      override suspend fun activate(code: String): ActivationResult = ActivationResult.Failure(Throwable("unused"))
-    }
-
+    val scratchCodeGenerator = FakeScratchCodeGenerator("code-123")
+    val cardActivator = FakeCardActivator(ActivationResult.Failure(Throwable("unused")))
     val coordinator = ScratchCardCoordinator(cardRepository, scratchCodeGenerator, cardActivator)
-
     val code = coordinator.scratchCard()
 
     assertEquals("code-123", code)
-    assertEquals(CardState.SCRATCHED, cardRepository.cardState.value)
-    assertEquals("code-123", cardRepository.scratchCode.value)
+    assertEquals(CardState.Scratched("code-123"), cardRepository.cardState.value)
+    assertEquals("code-123", (cardRepository.cardState.value as? CardState.Scratched)?.code)
   }
 
   @Test
@@ -50,10 +44,7 @@ class ScratchCardCoordinatorTest {
         return "code-123"
       }
     }
-    val cardActivator = object : CardActivator {
-      override suspend fun activate(code: String): ActivationResult = ActivationResult.Failure(Throwable("unused"))
-    }
-
+    val cardActivator = FakeCardActivator(ActivationResult.Failure(Throwable("unused")))
     val coordinator = ScratchCardCoordinator(cardRepository, scratchCodeGenerator, cardActivator)
 
     val job = launch { coordinator.scratchCard() }
@@ -61,70 +52,52 @@ class ScratchCardCoordinatorTest {
     job.cancel()
     runCurrent()
 
-    assertEquals(CardState.UNSCRATCHED, cardRepository.cardState.value)
-    assertNull(cardRepository.scratchCode.value)
+    assertEquals(CardState.Unscratched, cardRepository.cardState.value)
   }
 
   @Test
   fun `activateCard without code returns MissingCode`() = testScope.runTest {
     val cardRepository = CardRepositoryImpl()
-    val scratchCodeGenerator = object : ScratchCodeGenerator {
-      override suspend fun generate(): String = "unused"
-    }
-    val cardActivator = object : CardActivator {
-      override suspend fun activate(code: String): ActivationResult = ActivationResult.Activated(300000)
-    }
-
+    val scratchCodeGenerator = FakeScratchCodeGenerator("unused")
+    val cardActivator = FakeCardActivator(ActivationResult.Activated(300000))
     val coordinator = ScratchCardCoordinator(cardRepository, scratchCodeGenerator, cardActivator)
 
     val result = coordinator.activateCard()
 
     assertEquals(ActivationResult.MissingCode, result)
-    assertEquals(CardState.UNSCRATCHED, cardRepository.cardState.value)
+    assertEquals(CardState.Unscratched, cardRepository.cardState.value)
   }
 
   @Test
   fun `activateCard rejected keeps card scratched`() = testScope.runTest {
     val cardRepository = CardRepositoryImpl().apply { markScratched("code") }
-    val scratchCodeGenerator = object : ScratchCodeGenerator {
-      override suspend fun generate(): String = "unused"
-    }
-    val cardActivator = object : CardActivator {
-      override suspend fun activate(code: String): ActivationResult = ActivationResult.Rejected(277028)
-    }
-
+    val scratchCodeGenerator = FakeScratchCodeGenerator("unused")
+    val cardActivator = FakeCardActivator(ActivationResult.Rejected(277028))
     val coordinator = ScratchCardCoordinator(cardRepository, scratchCodeGenerator, cardActivator)
 
     val result = coordinator.activateCard()
 
     assertEquals(ActivationResult.Rejected(277028), result)
-    assertEquals(CardState.SCRATCHED, cardRepository.cardState.value)
+    assertEquals(CardState.Scratched("code"), cardRepository.cardState.value)
   }
 
   @Test
   fun `activateCard success marks card activated`() = testScope.runTest {
     val cardRepository = CardRepositoryImpl().apply { markScratched("code") }
-    val scratchCodeGenerator = object : ScratchCodeGenerator {
-      override suspend fun generate(): String = "unused"
-    }
-    val cardActivator = object : CardActivator {
-      override suspend fun activate(code: String): ActivationResult = ActivationResult.Activated(300000)
-    }
-
+    val scratchCodeGenerator = FakeScratchCodeGenerator("unused")
+    val cardActivator = FakeCardActivator(ActivationResult.Activated(300000))
     val coordinator = ScratchCardCoordinator(cardRepository, scratchCodeGenerator, cardActivator)
 
     val result = coordinator.activateCard()
 
     assertEquals(ActivationResult.Activated(300000), result)
-    assertEquals(CardState.ACTIVATED, cardRepository.cardState.value)
+    assertEquals(CardState.Activated("code"), cardRepository.cardState.value)
   }
 
   @Test
   fun `activateCard continues even if caller is canceled`() = testScope.runTest {
     val cardRepository = CardRepositoryImpl().apply { markScratched("code") }
-    val scratchCodeGenerator = object : ScratchCodeGenerator {
-      override suspend fun generate(): String = "unused"
-    }
+    val scratchCodeGenerator = FakeScratchCodeGenerator("unused")
     val cardActivator = object : CardActivator {
       override suspend fun activate(code: String): ActivationResult {
         delay(2000)
@@ -140,6 +113,6 @@ class ScratchCardCoordinatorTest {
     advanceTimeBy(2000)
     runCurrent()
 
-    assertEquals(CardState.ACTIVATED, cardRepository.cardState.value)
+    assertEquals(CardState.Activated("code"), cardRepository.cardState.value)
   }
 }

@@ -12,7 +12,6 @@ class MainViewModel @Inject constructor(
   private val repository: CardRepository,
 ) : ViewModel() {
   val cardState: StateFlow<CardState> = repository.cardState
-  val scratchCode: StateFlow<String?> = repository.scratchCode
 
   fun resetCard() {
     repository.reset()

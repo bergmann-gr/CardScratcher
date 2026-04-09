@@ -24,9 +24,7 @@ class ActivationViewModelTest {
     val scratchCodeGenerator = object : ScratchCodeGenerator {
       override suspend fun generate(): String = "unused"
     }
-    val cardActivator = object : CardActivator {
-      override suspend fun activate(code: String): ActivationResult = ActivationResult.Activated(300000)
-    }
+    val cardActivator = FakeCardActivator(ActivationResult.Activated(300000))
     val coordinator = ScratchCardCoordinator(cardRepository, scratchCodeGenerator, cardActivator)
     val viewModel = ActivationViewModel(coordinator)
 
@@ -40,12 +38,8 @@ class ActivationViewModelTest {
   @Test
   fun `activateCard without code sets Error state`() = runTest(mainDispatcherRule.dispatcher) {
     val cardRepository = CardRepositoryImpl()
-    val scratchCodeGenerator = object : ScratchCodeGenerator {
-      override suspend fun generate(): String = "unused"
-    }
-    val cardActivator = object : CardActivator {
-      override suspend fun activate(code: String): ActivationResult = ActivationResult.Activated(300000)
-    }
+    val scratchCodeGenerator = FakeScratchCodeGenerator("unused")
+    val cardActivator = FakeCardActivator(ActivationResult.Activated(300000))
     val coordinator = ScratchCardCoordinator(cardRepository, scratchCodeGenerator, cardActivator)
     val viewModel = ActivationViewModel(coordinator)
 
@@ -61,9 +55,7 @@ class ActivationViewModelTest {
   @Test
   fun `activateCard failure sets Error state with message`() = runTest(mainDispatcherRule.dispatcher) {
     val cardRepository = CardRepositoryImpl().apply { markScratched("code") }
-    val scratchCodeGenerator = object : ScratchCodeGenerator {
-      override suspend fun generate(): String = "unused"
-    }
+    val scratchCodeGenerator = FakeScratchCodeGenerator("unused")
     val cardActivator = object : CardActivator {
       override suspend fun activate(code: String): ActivationResult =
         ActivationResult.Failure(IllegalStateException("boom"))
