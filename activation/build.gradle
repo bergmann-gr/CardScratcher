@@ -1,22 +1,18 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias libs.plugins.android.application
+    alias libs.plugins.android.library
     alias libs.plugins.compose.compiler
     alias libs.plugins.hilt
     alias libs.plugins.ksp
 }
 
 android {
-    namespace = 'com.goodrequest.scratchcard'
+    namespace = 'com.goodrequest.scratchcard.feature.activation'
     compileSdk = 36
 
     defaultConfig {
-        applicationId "com.goodrequest.scratchcard"
-        versionCode 1
-        versionName "1.0"
-        minSdkVersion 24
-        targetSdkVersion 36
+        minSdk 24
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -46,21 +42,19 @@ android {
 dependencies {
     implementation libs.androidx.compose.material3
     implementation libs.androidx.compose.foundation
-    implementation libs.androidx.navigation.compose
     implementation libs.androidx.hilt.lifecycle.viewmodel
     implementation libs.androidx.lifecycle.viewmodel.compose
     implementation libs.hilt.navigation.compose
     implementation libs.hilt.android
+    ksp libs.hilt.compiler
+
+    implementation project(':card')
+    implementation project(':activation:api')
     implementation(libs.retrofit)
     implementation(libs.converter.moshi)
     implementation(libs.moshi.kotlin)
-    ksp libs.hilt.compiler
-    implementation project(':card')
-    implementation project(':activation:api')
-    implementation project(':scratch:api')
-    implementation project(':scratch')
-    implementation project(':activation')
-
 
     testImplementation libs.junit
+    testImplementation libs.kotlinx.coroutines.test
+    testImplementation project(':scratch:api')
 }

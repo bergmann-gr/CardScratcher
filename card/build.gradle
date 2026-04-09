@@ -1,0 +1,21 @@
+plugins {
+    id("org.jetbrains.kotlin.jvm")
+}
+
+dependencies {
+    implementation(libs.kotlinx.coroutines.core)
+    implementation project(':activation:api')
+    implementation project(':scratch:api')
+
+    testImplementation libs.junit
+    testImplementation libs.junit.jupiter
+    testImplementation libs.junit.jupiter.params
+    testImplementation libs.turbine
+    testImplementation libs.kotlinx.coroutines.test
+    testImplementation libs.jupiter.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}

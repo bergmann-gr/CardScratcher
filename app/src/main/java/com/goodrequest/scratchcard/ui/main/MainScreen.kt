@@ -16,30 +16,44 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.goodrequest.scratchcard.ACTIVATION_ROUTE
-import com.goodrequest.scratchcard.SCRATCH_ROUTE
-import com.goodrequest.scratchcard.ui.main.MainViewModel
+import com.goodrequest.scratchcard.card.model.CardState
 
 @Composable
 fun MainScreen(
   navController: NavHostController,
-  viewModel: MainViewModel = hiltViewModel()
+  scratchRoute: String,
+  activationRoute: String,
+  viewModel: MainViewModel = hiltViewModel(),
 ) {
   val state by viewModel.cardState.collectAsState()
+  val code by viewModel.scratchCode.collectAsState()
 
   Column(
-    modifier = Modifier.fillMaxSize().padding(16.dp),
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(16.dp),
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Text(state.name)
-
-    Button(onClick = { navController.navigate(SCRATCH_ROUTE) }) {
+    Text(code ?: "")
+    Spacer(modifier = Modifier.height(16.dp))
+    Button(onClick = { navController.navigate(scratchRoute) }) {
       Text("Go to Scratch")
     }
     Spacer(modifier = Modifier.height(16.dp))
-    Button(onClick = { navController.navigate(ACTIVATION_ROUTE) }) {
+    Button(
+      onClick = { navController.navigate(activationRoute) },
+      enabled = state == CardState.SCRATCHED
+    ) {
       Text("Go to Activation")
     }
+    Spacer(modifier = Modifier.height(16.dp))
+      Button(
+        onClick = { viewModel.resetCard()  },
+        enabled = state != CardState.UNSCRATCHED
+      ) {
+        Text("Reset")
+      }
   }
 }

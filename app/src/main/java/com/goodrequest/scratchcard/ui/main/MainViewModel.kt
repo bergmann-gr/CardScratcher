@@ -1,15 +1,20 @@
 package com.goodrequest.scratchcard.ui.main
 
 import androidx.lifecycle.ViewModel
-import com.goodrequest.scratchcard.domain.CardState
-import com.goodrequest.scratchcard.domain.ScratchCardRepository
+import com.goodrequest.scratchcard.card.CardRepository
+import com.goodrequest.scratchcard.card.model.CardState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-  repository: ScratchCardRepository
+  private val repository: CardRepository,
 ) : ViewModel() {
   val cardState: StateFlow<CardState> = repository.cardState
+  val scratchCode: StateFlow<String?> = repository.scratchCode
+
+  fun resetCard() {
+    repository.reset()
+  }
 }
