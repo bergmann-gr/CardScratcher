@@ -40,13 +40,21 @@ fun MainScreen(
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-      Text(text = cardState.toString()) //TODO
+      Text(
+        text = when (cardState) {
+          is CardState.Unscratched -> "Card is unscratched"
+          is CardState.Scratched -> "Card is scratched"
+          is CardState.Activated -> "Card is activated"
+        }
+      )
 
-      Text(text = when (val state = cardState) {
-        is CardState.Unscratched -> ""
-        is CardState.Scratched -> state.code
-        is CardState.Activated -> state.code
-      })
+      Text(
+        text = when (val state = cardState) {
+          is CardState.Unscratched -> ""
+          is CardState.Scratched -> state.code
+          is CardState.Activated -> state.code
+        }
+      )
 
       Button(
         onClick = onScratchClick,
@@ -63,7 +71,7 @@ fun MainScreen(
       }
 
       Button(
-        onClick = { viewModel.resetCard()  },
+        onClick = { viewModel.resetCard() },
         enabled = cardState !is CardState.Unscratched
       ) {
         Text(text = "Reset")

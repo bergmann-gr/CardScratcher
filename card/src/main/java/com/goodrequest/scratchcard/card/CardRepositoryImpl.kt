@@ -12,8 +12,8 @@ class CardRepositoryImpl : CardRepository {
     _cardState.value = CardState.Scratched(code)
   }
 
-  override fun markActivated(code: String) {
-    _cardState.value = CardState.Activated(code)
+  override fun markActivated(code: String, activationNumber: Int) {
+    _cardState.value = CardState.Activated(code, activationNumber)
   }
 
   override fun reset() {

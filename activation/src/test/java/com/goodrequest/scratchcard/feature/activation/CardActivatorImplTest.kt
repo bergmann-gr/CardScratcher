@@ -1,9 +1,12 @@
-package com.goodrequest.scratchcard.feature.activation.data
+package com.goodrequest.scratchcard.feature.activation
 
 import com.goodrequest.scratchcard.activation.api.ActivationResult
+import com.goodrequest.scratchcard.feature.activation.data.ActivationResponseDto
+import com.goodrequest.scratchcard.feature.activation.data.ApiService
+import com.goodrequest.scratchcard.feature.activation.data.CardActivatorImpl
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -52,4 +55,3 @@ class CardActivatorImplTest {
     }
   }
 }
-

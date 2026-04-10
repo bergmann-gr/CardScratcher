@@ -2,8 +2,8 @@ package com.goodrequest.scratchcard.feature.activation
 
 import com.goodrequest.scratchcard.activation.api.ActivationResult
 import com.goodrequest.scratchcard.activation.api.CardActivator
+import com.goodrequest.scratchcard.card.CardManager
 import com.goodrequest.scratchcard.card.CardRepositoryImpl
-import com.goodrequest.scratchcard.card.ScratchCardCoordinator
 import com.goodrequest.scratchcard.scratch.api.ScratchCodeGenerator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -25,8 +25,8 @@ class ActivationViewModelTest {
       override suspend fun generate(): String = "unused"
     }
     val cardActivator = FakeCardActivator(ActivationResult.Activated(300000))
-    val coordinator = ScratchCardCoordinator(cardRepository, scratchCodeGenerator, cardActivator)
-    val viewModel = ActivationViewModel(coordinator)
+    val cardManager = CardManager(cardRepository, scratchCodeGenerator, cardActivator)
+    val viewModel = ActivationViewModel(cardManager)
 
     viewModel.activateCard()
     assertEquals(ActivationUiState.Loading, viewModel.uiState.value)
@@ -40,8 +40,8 @@ class ActivationViewModelTest {
     val cardRepository = CardRepositoryImpl()
     val scratchCodeGenerator = FakeScratchCodeGenerator("unused")
     val cardActivator = FakeCardActivator(ActivationResult.Activated(300000))
-    val coordinator = ScratchCardCoordinator(cardRepository, scratchCodeGenerator, cardActivator)
-    val viewModel = ActivationViewModel(coordinator)
+    val cardManager = CardManager(cardRepository, scratchCodeGenerator, cardActivator)
+    val viewModel = ActivationViewModel(cardManager)
 
     viewModel.activateCard()
     advanceUntilIdle()
@@ -53,20 +53,21 @@ class ActivationViewModelTest {
   }
 
   @Test
-  fun `activateCard failure sets Error state with message`() = runTest(mainDispatcherRule.dispatcher) {
-    val cardRepository = CardRepositoryImpl().apply { markScratched("code") }
-    val scratchCodeGenerator = FakeScratchCodeGenerator("unused")
-    val cardActivator = object : CardActivator {
-      override suspend fun activate(code: String): ActivationResult =
-        ActivationResult.Failure(IllegalStateException("boom"))
+  fun `activateCard failure sets Error state with message`() =
+    runTest(mainDispatcherRule.dispatcher) {
+      val cardRepository = CardRepositoryImpl().apply { markScratched("code") }
+      val scratchCodeGenerator = FakeScratchCodeGenerator("unused")
+      val cardActivator = object : CardActivator {
+        override suspend fun activate(code: String): ActivationResult =
+          ActivationResult.Failure(IllegalStateException("boom"))
+      }
+      val cardManager = CardManager(cardRepository, scratchCodeGenerator, cardActivator)
+      val viewModel = ActivationViewModel(cardManager)
+
+      viewModel.activateCard()
+      advanceUntilIdle()
+
+      assertEquals(ActivationUiState.Error("boom"), viewModel.uiState.value)
     }
-    val coordinator = ScratchCardCoordinator(cardRepository, scratchCodeGenerator, cardActivator)
-    val viewModel = ActivationViewModel(coordinator)
-
-    viewModel.activateCard()
-    advanceUntilIdle()
-
-    assertEquals(ActivationUiState.Error("boom"), viewModel.uiState.value)
-  }
 }
 

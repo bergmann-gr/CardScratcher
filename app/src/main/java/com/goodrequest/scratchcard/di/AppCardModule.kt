@@ -1,13 +1,13 @@
 package com.goodrequest.scratchcard.di
 
+import com.goodrequest.scratchcard.activation.api.CardActivator
+import com.goodrequest.scratchcard.card.CardManager
 import com.goodrequest.scratchcard.card.CardRepository
 import com.goodrequest.scratchcard.card.CardRepositoryImpl
-import com.goodrequest.scratchcard.card.ScratchCardCoordinator
-import com.goodrequest.scratchcard.activation.api.CardActivator
-import com.goodrequest.scratchcard.scratch.api.ScratchCodeGenerator
-import com.goodrequest.scratchcard.feature.activation.data.CardActivatorImpl
 import com.goodrequest.scratchcard.feature.activation.data.ApiService
+import com.goodrequest.scratchcard.feature.activation.data.CardActivatorImpl
 import com.goodrequest.scratchcard.feature.scratch.data.ScratchCodeGeneratorImpl
+import com.goodrequest.scratchcard.scratch.api.ScratchCodeGenerator
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -55,11 +55,11 @@ object AppCardModule {
 
   @Provides
   @Singleton
-  fun provideScratchCardCoordinator(
+  fun provideCardManager(
     cardRepository: CardRepository,
     scratchCodeGenerator: ScratchCodeGenerator,
     cardActivator: CardActivator,
-  ): ScratchCardCoordinator = ScratchCardCoordinator(
+  ): CardManager = CardManager(
     cardRepository = cardRepository,
     scratchCodeGenerator = scratchCodeGenerator,
     cardActivator = cardActivator,

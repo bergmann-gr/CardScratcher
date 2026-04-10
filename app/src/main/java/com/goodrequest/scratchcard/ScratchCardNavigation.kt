@@ -16,8 +16,10 @@ import kotlinx.serialization.Serializable
 private sealed interface ScratchCardDestination : NavKey {
   @Serializable
   data object Main : ScratchCardDestination
+
   @Serializable
   object Scratch : ScratchCardDestination
+
   @Serializable
   data object Activation : ScratchCardDestination
 }

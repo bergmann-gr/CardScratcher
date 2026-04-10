@@ -22,8 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.goodrequest.scratchcard.feature.scratch.data.ScratchUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,23 +63,31 @@ fun ScratchScreen(
         horizontalAlignment = Alignment.CenterHorizontally
       ) {
 
-      if(scratchState is ScratchUiState.Success) {
-        Text(text = "Card Scratched Successfully!")
-        Text(text = (scratchState as ScratchUiState.Success).code, style = MaterialTheme.typography.bodyMedium)
-      } else if (scratchState is ScratchUiState.Error) {
-        Text(text = "Failed to scratch the card. Please try again.", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.error)
+        if (scratchState is ScratchUiState.Success) {
+          Text(text = "Card Scratched Successfully!")
+          Text(
+            text = (scratchState as ScratchUiState.Success).code,
+            style = MaterialTheme.typography.bodyMedium
+          )
+        } else if (scratchState is ScratchUiState.Error) {
+          Text(
+            text = "Failed to scratch the card (${(scratchState as ScratchUiState.Error).message})",
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.error
+          )
+        }
+
+        Button(
+          enabled = scratchState !is ScratchUiState.Loading && scratchState !is ScratchUiState.Success,
+          onClick = { scratchViewModel.scratchCard() }
+        ) {
+          Text(text = "Scratch Card")
+        }
       }
 
-      Button(
-        enabled = scratchState !is ScratchUiState.Loading && scratchState !is ScratchUiState.Success,
-        onClick = { scratchViewModel.scratchCard() }
-      ) {
-        Text(text = "Scratch Card")
-      }
-    }
-
-    if (scratchState is ScratchUiState.Loading)
-      CircularProgressIndicator()
+      if (scratchState is ScratchUiState.Loading)
+        CircularProgressIndicator()
     }
   }
 }

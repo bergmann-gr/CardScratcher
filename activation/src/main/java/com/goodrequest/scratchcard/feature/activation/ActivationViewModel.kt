@@ -1,14 +1,14 @@
 package com.goodrequest.scratchcard.feature.activation
 
 import androidx.lifecycle.ViewModel
-import com.goodrequest.scratchcard.card.ScratchCardCoordinator
+import androidx.lifecycle.viewModelScope
 import com.goodrequest.scratchcard.activation.api.ActivationResult
+import com.goodrequest.scratchcard.card.CardManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewModelScope
 import javax.inject.Inject
 
 sealed interface ActivationUiState {
@@ -20,7 +20,7 @@ sealed interface ActivationUiState {
 
 @HiltViewModel
 class ActivationViewModel @Inject constructor(
-  private val coordinator: ScratchCardCoordinator,
+  private val cardManager: CardManager,
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow<ActivationUiState>(ActivationUiState.Idle)
@@ -31,12 +31,16 @@ class ActivationViewModel @Inject constructor(
 
     _uiState.value = ActivationUiState.Loading
     viewModelScope.launch {
-      when (val result = coordinator.activateCard()) {
-        is ActivationResult.Activated -> _uiState.value = ActivationUiState.Success(result.androidVersion)
+      when (val result = cardManager.activateCard()) {
+        is ActivationResult.Activated -> _uiState.value =
+          ActivationUiState.Success(result.androidVersion)
+
         is ActivationResult.Rejected -> _uiState.value =
           ActivationUiState.Error("Activation failed: ${result.androidVersion}")
+
         is ActivationResult.MissingCode -> _uiState.value =
           ActivationUiState.Error("No scratch code available for activation")
+
         is ActivationResult.Failure -> _uiState.value =
           ActivationUiState.Error(result.throwable.message ?: "Unknown error")
       }

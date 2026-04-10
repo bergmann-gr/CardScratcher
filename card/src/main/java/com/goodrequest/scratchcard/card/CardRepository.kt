@@ -7,7 +7,7 @@ interface CardRepository {
   val cardState: StateFlow<CardState>
 
   fun markScratched(code: String)
-  fun markActivated(code: String)
+  fun markActivated(code: String, activationNumber: Int)
   fun reset()
 }
 
