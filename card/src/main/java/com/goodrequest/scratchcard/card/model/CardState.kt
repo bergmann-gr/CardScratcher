@@ -5,4 +5,3 @@ sealed class CardState {
   data class Scratched(val code: String): CardState()
   data class Activated(val code: String): CardState()
 }
-

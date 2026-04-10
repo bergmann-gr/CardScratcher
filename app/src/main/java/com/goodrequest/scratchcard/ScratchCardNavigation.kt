@@ -40,8 +40,16 @@ fun ScratchCardNav() {
           onActivationClick = { backStack.add(ScratchCardDestination.Activation) },
         )
       }
-      entry<ScratchCardDestination.Scratch> { ScratchScreen() }
-      entry<ScratchCardDestination.Activation> { ActivationScreen() }
+      entry<ScratchCardDestination.Scratch> {
+        ScratchScreen(
+          onBack = { backStack.removeAt(backStack.lastIndex) }
+        )
+      }
+      entry<ScratchCardDestination.Activation> {
+        ActivationScreen(
+          onBack = { backStack.removeAt(backStack.lastIndex) }
+        )
+      }
     },
   )
 }

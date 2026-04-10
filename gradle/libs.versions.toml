@@ -44,6 +44,8 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version = "1.10.6" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version = "1.4.0" }
+androidx-compose-material-icons = { module = "androidx.compose.material:material-icons-core", version = "1.7.8" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.0" }
 
 jupiter-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiterApi" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junitJupiterEngine" }
